@@ -1,0 +1,27 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker images
+      run: docker-compose build
+
+    - name: Git Frontend Semantic Version
+      uses: PaulHatch/semantic-version@v5.0.0-alpha2
+      with:
+        bump_each-commit: true
+      id: fe-version
+    - name: Get version values
+      run: echo "The selected version is  ${{ steps.fe-version.outputs.version }}, ${{ steps.fe-version.outputs.major }}, ${{ steps.fe-version.outputs.minor }}, ${{ steps.fe-version.outputs.patch }}, ${{ steps.fe-version.outputs.version_tag }}, ${{ steps.fe-version.outputs.increment }}"
+

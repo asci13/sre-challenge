@@ -1,0 +1,14 @@
+version: '3'
+services:
+  dummyprovider:
+    build: ./dummy-pdf-or-png
+    ports:
+     - "3000:3000"
+    image: ${REGISTRY}dummyprovider:${CURRENT_TAG}
+  dummyfrontend:
+    build: ./dummyfrontend
+    depends_on:
+      - dummyprovider
+    ports:
+      - "3001:3001"
+    image: ${REGISTRY}dummyfrontend:${CURRENT_TAG}
