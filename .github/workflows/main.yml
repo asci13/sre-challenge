@@ -28,7 +28,25 @@ jobs:
       uses: PaulHatch/semantic-version@v5.0.0-alpha2
       id: version
       with:
-        bump_each-commit: true
+        bump_each_commit: true
     - name: Get version values
-      run: echo '${{ steps.version.outputs.version }}''
+      run: echo '${{ steps.version.outputs.version }}'
+
+    - name: Push Frontend image to registry
+      uses: mattes/gce-docker-push-action@v1.0.0
+      with:
+        creds: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        src: dummyfrontend:build
+        dst: gcr.io/asci13-sre-challenge/dummyfrontend:${{ steps.version.outputs.version }}
+
+    - name: Push Dummyprovider image to registry
+      uses: mattes/gce-docker-push-action@v1.0.0
+      with:
+        creds: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        src: dummyprovider:build
+        dst: gcr.io/asci13-sre-challenge/dummyprovider:${{ steps.version.outputs.version }}
+
+
+
+
 
