@@ -38,4 +38,3 @@ jobs:
         image_name: dummyfrontend
         image_tag: latest,${{ steps.version.outputs.version }}
         dockerfile: ./dummyfrontend/Dockerfile
-        context: ./dummyfrontend
