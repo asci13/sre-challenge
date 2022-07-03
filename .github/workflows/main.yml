@@ -28,6 +28,16 @@ jobs:
         bump_each_commit: true
     - name: Get version values
       run: echo '${{ steps.version.outputs.version }}'
+      
+    - name: Push dummy-pdf-or-png image
+      uses: RafikFarhad/push-to-gcr-github-action@v4.1
+      with:
+        gcloud_service_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} # can be base64 encoded or plain text
+        registry: eu.gcr.io
+        project_id: asci13-sre-challenge
+        image_name: dummy-pdf-or-png
+        image_tag: latest,${{ steps.version.outputs.version }}
+        context: ./sre/dummy-pdf-or-png
 
     - name: Push frontend image
       uses: RafikFarhad/push-to-gcr-github-action@v4.1
