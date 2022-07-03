@@ -20,9 +20,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Build the Docker images
-      run: docker-compose build
 
     - name: Version repo
       uses: PaulHatch/semantic-version@v5.0.0-alpha2
@@ -32,21 +29,13 @@ jobs:
     - name: Get version values
       run: echo '${{ steps.version.outputs.version }}'
 
-    - name: Push Frontend image to registry
-      uses: mattes/gce-docker-push-action@v1.0.0
+    - name: Push frontend image
+    - uses: RafikFarhad/push-to-gcr-github-action@v4.1
       with:
-        creds: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        src: dummyfrontend:build
-        dst: eu.gcr.io/asci13-sre-challenge/dummyfrontend:${{ steps.version.outputs.version }}
-
-    - name: Push Dummyprovider image to registry
-      uses: mattes/gce-docker-push-action@v1.0.0
-      with:
-        creds: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        src: dummyprovider:build
-        dst: eu.gcr.io/asci13-sre-challenge/dummyprovider:${{ steps.version.outputs.version }}
-
-
-
-
-
+        gcloud_service_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} # can be base64 encoded or plain text
+        registry: eu.gcr.io
+        project_id: asci13-sre-challenge
+        image_name: dummyfrontend
+        image_tag: latest,${{ steps.version.outputs.version }}
+        dockerfile: ./dummyfrontend/Dockerfile
+        context: ./dummyfrontend
