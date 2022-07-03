@@ -14,14 +14,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
     - name: Build the Docker images
       run: docker-compose build
 
-    - name: Git Frontend Semantic Version
+    - name: Version repo
       uses: PaulHatch/semantic-version@v5.0.0-alpha2
+      id: version
       with:
         bump_each-commit: true
-      id: fe-version
     - name: Get version values
-      run: echo "The selected version is  ${{ steps.fe-version.outputs.version }}, ${{ steps.fe-version.outputs.major }}, ${{ steps.fe-version.outputs.minor }}, ${{ steps.fe-version.outputs.patch }}, ${{ steps.fe-version.outputs.version_tag }}, ${{ steps.fe-version.outputs.increment }}"
+      run: echo '${{ steps.version.outputs.version }}''
 
