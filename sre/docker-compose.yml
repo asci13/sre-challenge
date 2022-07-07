@@ -9,6 +9,9 @@ services:
     build: ./dummyfrontend
     depends_on:
       - dummyprovider
+    environment:
+      - ListenPort=:5555
+      - BackendAddress=http://dummyprovider:3000
     ports:
-      - "3001:3001"
+      - "5555:5555"
     image: ${REGISTRY}dummyfrontend:${CURRENT_TAG}

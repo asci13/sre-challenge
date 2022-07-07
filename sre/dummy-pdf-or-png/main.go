@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -23,6 +24,7 @@ func serveRandomFile(w http.ResponseWriter, r *http.Request) {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	http.HandleFunc("/", serveRandomFile)
+	fmt.Printf("Handlers started.\n")
 	err := http.ListenAndServe(":3000", nil)
 	if err != nil {
 		log.Fatal(err)

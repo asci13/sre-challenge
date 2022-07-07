@@ -5,5 +5,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags '-extldflags "-static"' -o dummyf
 
 FROM scratch
 WORKDIR /
+ENV ListenPort=
+ENV BackendAddress=
 COPY --from=build /build/dummyfrontend /
 ENTRYPOINT ["/dummyfrontend"]
