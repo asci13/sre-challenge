@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kompose.cmd: C:\Program Files\Docker\Docker\kompose.exe convert
+    kompose.service.expose: "true"
+    kompose.service.type: nodeport
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: dummyfrontend
+  name: dummyfrontend
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: dummyfrontend
+                port:
+                  number: 5555
+            path: /
+            pathType: Prefix
+status:
+  loadBalancer: {}

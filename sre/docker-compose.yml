@@ -5,6 +5,9 @@ services:
     ports:
      - "3000:3000"
     image: ${REGISTRY}dummyprovider:${CURRENT_TAG}
+    labels:
+      kompose.service.type: nodeport
+      kompose.service.expose: "true"
   dummyfrontend:
     build: ./dummyfrontend
     depends_on:
@@ -15,3 +18,6 @@ services:
     ports:
       - "5555:5555"
     image: ${REGISTRY}dummyfrontend:${CURRENT_TAG}
+    labels:
+      kompose.service.type: nodeport
+      kompose.service.expose: "true"
