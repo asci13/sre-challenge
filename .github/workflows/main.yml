@@ -44,31 +44,9 @@ jobs:
       with:
         python-version: 3.7
 
-    - name: Set up chart-testing
-      uses: helm/chart-testing-action@v2.2.1
-
     - name: Run helm lint
       run: |
         helm lint ./charts/sre-spec-chart
-
-    - name: Run chart-testing (list-changed)
-      id: list-changed
-      run: |
-        changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
-        if [[ -n "$changed" ]]; then
-          echo "::set-output name=changed::true"
-        fi
-
-    - name: Run chart-testing (lint)
-      run: ct lint --target-branch ${{ github.event.repository.default_branch }}
-
-    - name: Create kind cluster
-      uses: helm/kind-action@v1.2.0
-      if: steps.list-changed.outputs.changed == 'true'
-
-    - name: Run chart-testing (install)
-      run: ct install
-    
       
     - name: Push dummy-pdf-or-png image
       uses: RafikFarhad/push-to-gcr-github-action@v4.1
