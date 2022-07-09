@@ -32,8 +32,8 @@ jobs:
 
     - name: Patch chart.yaml
       run: |
-        sed -r 's/^(\s*)(version:.*$)/\1version: ${{ steps.version.outputs.version }}/' ./sre-spec-chart/Chart.yaml
-        sed -r 's/^(\s*)(appVersion:.*$)/\1appVersion: ${{ steps.version.outputs.version }}/' ./sre-spec-chart/Chart.yaml
+        sed -r 's/^(\s*)(version:.*$)/\1version: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
+        sed -r 's/^(\s*)(appVersion:.*$)/\1appVersion: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
 
     - name: Set up Helm
       uses: azure/setup-helm@v1
