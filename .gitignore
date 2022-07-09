@@ -33,8 +33,5 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-# Ignore go.sum file
-go.sum
-
 # Ignore VS Code logs
 .vscode/*.log
