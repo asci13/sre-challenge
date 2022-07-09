@@ -30,23 +30,23 @@ jobs:
     - name: Get version values
       run: echo '${{ steps.version.outputs.version }}'
 
-    - name: Patch chart.yaml
-      run: |
-        sed -r 's/^(\s*)(version:.*$)/\1version: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
-        sed -r 's/^(\s*)(appVersion:.*$)/\1appVersion: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
-
     - name: Set up Helm
       uses: azure/setup-helm@v1
       with:
         version: v3.8.1
 
-    - uses: actions/setup-python@v2
-      with:
-        python-version: 3.7
-
-    - name: Run helm lint
+    - name: version, lint and package chart.yaml
       run: |
+        sed -r 's/^(\s*)(version:.*$)/\1version: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
+        sed -r 's/^(\s*)(appVersion:.*$)/\1appVersion: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
         helm lint ./charts/sre-spec-chart
+        helm package ./charts/sre-spec-chart
+    
+    - name: Store helm chart as GH artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: helm charts
+          path: ./*.tgz
       
     - name: Push dummy-pdf-or-png image
       uses: RafikFarhad/push-to-gcr-github-action@v4.1
