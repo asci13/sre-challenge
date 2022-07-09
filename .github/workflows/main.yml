@@ -31,8 +31,7 @@ jobs:
       run: echo '${{ steps.version.outputs.version }}'
 
     - name: Patch chart.yaml
-      - shell: bash
-        run: |
+      run: |
         sed -r 's/^(\s*)(version:.*$)/\1version: ${{ steps.version.outputs.version }}/' ./sre/sre-spec-chart/Chart.yaml
         sed -r 's/^(\s*)(appVersion:.*$)/\1appVersion: ${{ steps.version.outputs.version }}/' ./sre/sre-spec-chart/Chart.yaml
 
