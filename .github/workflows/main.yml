@@ -43,10 +43,10 @@ jobs:
         helm package ./charts/sre-spec-chart
     
     - name: Store helm chart as GH artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: helm charts
-          path: ./*.tgz
+      uses: actions/upload-artifact@v3
+      with:
+        name: helm charts
+        path: ./*.tgz
       
     - name: Push dummy-pdf-or-png image
       uses: RafikFarhad/push-to-gcr-github-action@v4.1
