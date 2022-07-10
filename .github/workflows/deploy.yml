@@ -91,12 +91,7 @@ jobs:
         location: ${{ env.GKE_ZONE }}
         credentials: ${{ secrets.GKE_SA_KEY }}
 
-    - name: Set up Helm
-      uses: azure/setup-helm@v1
-      with:
-        version: v3.8.1
     
     - name: Run helm install on chart tarball
       run: |
-        file=ls *.tgz
-        helm install "$file" --generate-name
+        helm install charts/sre-spec-chart --generate-name
