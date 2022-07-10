@@ -46,21 +46,6 @@ func Test_respondToDefaultRequest_IncorrectRequestId(t *testing.T) {
 	assert.Equal(t, "{\"message\":\"RequestID wasn't a valid int.\"}", response.Body.String(), "Should provide the correct error output as json.")
 }
 
-// Return bad request in case of invalid request id
-func Test_respondToDefaultRequest_CorrectRequestId(t *testing.T) {
-	request, _ := http.NewRequest("GET", "http://127.0.0.1:5555/123", nil)
-	//response := httptest.NewRecorder()
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		t.Error(err) //Something is wrong while sending request
-	}
-
-	//respondToDefaultRequest(response, request)
-	assert.NotNil(t, response)
-	//assert.Equal(t, http.StatusBadRequest, response.Result().StatusCode, "Should return bad request.")
-	//assert.Equal(t, "{\"message\":\"RequestID wasn't a valid int.\"}", response.Body.String(), "Should provide the correct error output as json.")
-}
-
 var fileChecks = []struct {
 	responseFile      string
 	requestId         int
