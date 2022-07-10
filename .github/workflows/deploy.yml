@@ -94,4 +94,4 @@ jobs:
     
     - name: Run helm install on chart tarball
       run: |
-        helm install charts/sre-spec-chart --generate-name
+        helm upgrade charts/sre-spec-chart --generate-name
