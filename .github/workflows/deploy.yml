@@ -95,7 +95,8 @@ jobs:
       uses: azure/setup-helm@v1
       with:
         version: v3.8.1
-
+    
+    - name: Run helm install on chart tarball
     - run: |-
         file=ls *.tgz
-        helm install $file
+        helm install "$file" --generate-name
