@@ -1,0 +1,90 @@
+name: Deployment
+
+on:
+  push:
+    branches: [ "master" ]
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./sre
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Version repo
+      uses: PaulHatch/semantic-version@v5.0.0-alpha2
+      id: version
+      with:
+        bump_each_commit: true
+
+    - name: Get version values
+      run: echo '${{ steps.version.outputs.version }}'
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v1
+      with:
+        version: v3.8.1
+
+    - name: version, lint and package chart.yaml
+      run: |
+        sed -r 's/^version:.*$/version: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
+        sed -r 's/^appVersion:.*$/appVersion: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
+        helm lint ./charts/sre-spec-chart
+        helm package ./charts/sre-spec-chart
+    
+    - name: Store helm chart as GH artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: helm charts
+        path: ./**/*.tgz
+      
+    - name: Push dummy-pdf-or-png image
+      uses: RafikFarhad/push-to-gcr-github-action@v4.1
+      with:
+        gcloud_service_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} # can be base64 encoded or plain text
+        registry: eu.gcr.io
+        project_id: asci13-sre-challenge
+        image_name: dummy-pdf-or-png
+        image_tag: latest,${{ steps.version.outputs.version }}
+        context: ./sre/dummy-pdf-or-png
+
+    - name: Push frontend image
+      uses: RafikFarhad/push-to-gcr-github-action@v4.1
+      with:
+        gcloud_service_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} # can be base64 encoded or plain text
+        registry: eu.gcr.io
+        project_id: asci13-sre-challenge
+        image_name: dummyfrontend
+        image_tag: latest,${{ steps.version.outputs.version }}
+        context: ./sre/dummyfrontend
+  
+  deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: helm charts
+        path: .
+
+    - name: 'Deploy'
+      uses: 'deliverybot/helm@v1'
+      with:
+        release: 'sre'
+        namespace: 'default'
+        chart: 'sre-spec-chart'
+      env:
+        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+
