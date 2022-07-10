@@ -7,9 +7,16 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  PROJECT_ID: asci13-sre-challenge
+  GKE_CLUSTER: asci13-sre-challenge-gke   # Add your cluster name here.
+  GKE_ZONE: europe-west1   # Add your cluster zone here.
+  DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+  CHART_RELEASE: sre-challenge
+
 jobs:
 
-  build:
+  deploy:
 
     runs-on: ubuntu-latest
     defaults:
@@ -23,6 +30,7 @@ jobs:
       uses: PaulHatch/semantic-version@v5.0.0-alpha2
       id: version
       with:
+        tag_prefix: "v"
         bump_each_commit: true
 
     - name: Get version values
@@ -35,10 +43,10 @@ jobs:
 
     - name: version, lint and package chart.yaml
       run: |
-        sed -r 's/^version:.*$/version: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
-        sed -r 's/^appVersion:.*$/appVersion: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
-        helm lint ./charts/sre-spec-chart
-        helm package ./charts/sre-spec-chart
+        sed -i 's/^version:.*$/version: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
+        sed -i 's/^appVersion:.*$/appVersion: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
+        helm lint charts/sre-spec-chart
+        helm package charts/sre-spec-chart
     
     - name: Store helm chart as GH artifact
       uses: actions/upload-artifact@v3
@@ -65,24 +73,32 @@ jobs:
         image_name: dummyfrontend
         image_tag: latest,${{ steps.version.outputs.version }}
         context: ./sre/dummyfrontend
-  
-  deploy:
-    runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: actions/download-artifact@v3
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
-        name: helm charts
-        path: .
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT }}
 
-    - name: 'Deploy'
-      uses: 'deliverybot/helm@v1'
+    # Configure Docker to use the gcloud command-line tool as a credential
+    # helper for authentication
+    - run: |-
+        gcloud --quiet auth configure-docker
+
+    # Get the GKE credentials so we can deploy to the cluster
+    - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
       with:
-        release: 'sre'
-        namespace: 'default'
-        chart: 'sre-spec-chart'
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
+        credentials: ${{ secrets.GKE_SA_KEY }}
 
+    
+    - name: Run helm install on chart tarball
+      run: |
+        release=$(helm ls --all --short)
+        if [ -z "$release" ]
+        then
+          helm install ${{ env.CHART_RELEASE }} charts/sre-spec-chart
+        else
+          helm upgrade ${{ env.CHART_RELEASE }} charts/sre-spec-chart
+        fi

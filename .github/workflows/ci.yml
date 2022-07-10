@@ -23,6 +23,7 @@ jobs:
       uses: PaulHatch/semantic-version@v5.0.0-alpha2
       id: version
       with:
+        tag_prefix: "v"
         bump_each_commit: true
 
     - name: Get version values
@@ -35,10 +36,10 @@ jobs:
 
     - name: version, lint and package chart.yaml
       run: |
-        sed -r 's/^(\s*)(version:.*$)/\1version: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
-        sed -r 's/^(\s*)(appVersion:.*$)/\1appVersion: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
-        helm lint ./charts/sre-spec-chart
-        helm package ./charts/sre-spec-chart
+        sed -i 's/^version:.*$/version: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
+        sed -i 's/^appVersion:.*$/appVersion: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
+        helm lint charts/sre-spec-chart
+        helm package charts/sre-spec-chart
     
     - name: Store helm chart as GH artifact
       uses: actions/upload-artifact@v3
@@ -53,7 +54,7 @@ jobs:
         registry: eu.gcr.io
         project_id: asci13-sre-challenge
         image_name: dummy-pdf-or-png
-        image_tag: latest,${{ steps.version.outputs.version }}
+        image_tag: ${{ steps.version.outputs.version }}-prerelease
         context: ./sre/dummy-pdf-or-png
 
     - name: Push frontend image
@@ -63,5 +64,5 @@ jobs:
         registry: eu.gcr.io
         project_id: asci13-sre-challenge
         image_name: dummyfrontend
-        image_tag: latest,${{ steps.version.outputs.version }}
+        image_tag: prerelease-prerelease
         context: ./sre/dummyfrontend
