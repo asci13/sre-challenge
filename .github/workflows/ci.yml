@@ -35,8 +35,8 @@ jobs:
 
     - name: version, lint and package chart.yaml
       run: |
-        sed -i 's/^(\s*)(version:.*$)/\1version: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
-        sed -i 's/^(\s*)(appVersion:.*$)/\1appVersion: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
+        sed -i 's/^version:.*$/version: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
+        sed -i 's/^appVersion:.*$/appVersion: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
         helm lint charts/sre-spec-chart
         helm package charts/sre-spec-chart
     
