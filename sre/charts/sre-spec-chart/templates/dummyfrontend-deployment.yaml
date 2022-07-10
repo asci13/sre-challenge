@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Program Files\Docker\Docker\kompose.exe convert
+    kompose.service.expose: "true"
+    kompose.service.type: nodeport
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: dummyfrontend
+  name: dummyfrontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: dummyfrontend
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Program Files\Docker\Docker\kompose.exe convert
+        kompose.service.expose: "true"
+        kompose.service.type: nodeport
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: dummyfrontend
+    spec:
+      containers:
+        - image: 'eu.gcr.io/asci13-sre-challenge/dummyfrontend:latest'
+          name: dummyfrontend
+          ports:
+            - containerPort: 5555
+          env:
+            - name: BackendAddress
+              value: http://dummyprovider:3000
+            - name: ListenPort
+              value: :5555
+          resources: {}
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 5555
+              httpHeaders:
+              - name: X-Kubernetes-Probe
+                value: Liveness
+            timeoutSeconds: 300
+            periodSeconds: 30
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /ready
+              port: 5555
+              httpHeaders:
+              - name: X-Kubernetes-Probe
+                value: Startup
+            timeoutSeconds: 300
+            periodSeconds: 30
+            failureThreshold: 10
+      restartPolicy: Always
+status: {}
