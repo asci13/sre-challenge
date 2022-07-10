@@ -73,14 +73,6 @@ jobs:
         image_tag: latest,${{ steps.version.outputs.version }}
         context: ./sre/dummyfrontend
 
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: actions/download-artifact@v3
-      with:
-        name: helm charts
-        path: .
-
     # Setup gcloud CLI
     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
@@ -105,5 +97,5 @@ jobs:
         version: v3.8.1
 
     - run: |-
-        $file = find "/mnt/host/c/Users/asci1/Downloads/helm charts" -name *.tgz
+        $file = find "./sre/**" -name *.tgz
         helm install $file
