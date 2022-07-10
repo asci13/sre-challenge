@@ -16,7 +16,7 @@ env:
 
 jobs:
 
-  build:
+  deploy:
 
     runs-on: ubuntu-latest
     defaults:
@@ -72,9 +72,6 @@ jobs:
         image_name: dummyfrontend
         image_tag: latest,${{ steps.version.outputs.version }}
         context: ./sre/dummyfrontend
-  
-  deploy:
-    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
