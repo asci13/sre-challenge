@@ -97,6 +97,6 @@ jobs:
         version: v3.8.1
     
     - name: Run helm install on chart tarball
-      run: |-
+      run: |
         file=ls *.tgz
         helm install "$file" --generate-name
