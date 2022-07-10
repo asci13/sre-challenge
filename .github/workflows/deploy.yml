@@ -30,6 +30,7 @@ jobs:
       uses: PaulHatch/semantic-version@v5.0.0-alpha2
       id: version
       with:
+        tag_prefix: "v"
         bump_each_commit: true
 
     - name: Get version values
