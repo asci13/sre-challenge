@@ -95,4 +95,6 @@ jobs:
     
     - name: Run helm install on chart tarball
       run: |
-        helm upgrade charts/sre-spec-chart
+        release=$(ls --all --short)
+        helm uninstall $release
+        helm install charts/sre-spec-chart --generate-name
