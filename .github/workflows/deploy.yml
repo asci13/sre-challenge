@@ -42,10 +42,10 @@ jobs:
 
     - name: version, lint and package chart.yaml
       run: |
-        sed -r 's/^version:.*$/version: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
-        sed -r 's/^appVersion:.*$/appVersion: ${{ steps.version.outputs.version }}/' ./charts/sre-spec-chart/Chart.yaml
-        helm lint ./charts/sre-spec-chart
-        helm package ./charts/sre-spec-chart
+        sed -i 's/^version:.*$/version: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
+        sed -i 's/^appVersion:.*$/appVersion: ${{ steps.version.outputs.version }}/' charts/sre-spec-chart/Chart.yaml
+        helm lint charts/sre-spec-chart
+        helm package charts/sre-spec-chart
     
     - name: Store helm chart as GH artifact
       uses: actions/upload-artifact@v3
@@ -97,5 +97,5 @@ jobs:
         version: v3.8.1
 
     - run: |-
-        $file = find "./sre/**" -name *.tgz
+        file=ls *.tgz
         helm install $file
