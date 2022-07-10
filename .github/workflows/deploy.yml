@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: ${{ secrets.GKE_PROJECT }}-gke   # Add your cluster name here.
+  PROJECT_ID: asci13-sre-challenge
+  GKE_CLUSTER: asci13-sre-challenge-gke   # Add your cluster name here.
   GKE_ZONE: europe-west1-c   # Add your cluster zone here.
   DEPLOYMENT_NAME: gke-test # Add your deployment name here.
   IMAGE: static-site
