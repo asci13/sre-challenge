@@ -7,6 +7,13 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: ${{ secrets.GKE_PROJECT }}-gke   # Add your cluster name here.
+  GKE_ZONE: europe-west1c   # Add your cluster zone here.
+  DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+  IMAGE: static-site
+
 jobs:
 
   build:
@@ -77,12 +84,29 @@ jobs:
         name: helm charts
         path: .
 
-    - name: 'Deploy'
-      uses: 'deliverybot/helm@v1'
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
-        release: 'sre'
-        namespace: 'default'
-        chart: 'sre-spec-chart'
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT }}
 
+    # Configure Docker to use the gcloud command-line tool as a credential
+    # helper for authentication
+    - run: |-
+        gcloud --quiet auth configure-docker
+
+    # Get the GKE credentials so we can deploy to the cluster
+    - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
+        credentials: ${{ secrets.GKE_SA_KEY }}
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v1
+      with:
+        version: v3.8.1
+
+    - run: |-
+        $file = find "/mnt/host/c/Users/asci1/Downloads/helm charts" -name *.tgz
+        helm install $file

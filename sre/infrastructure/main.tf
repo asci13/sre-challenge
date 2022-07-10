@@ -6,10 +6,28 @@ terraform {
     }
   }
 }
+variable "project_id" {
+  description = "project id"
+}
 
+variable "region" {
+  description = "region"
+}
+
+variable "zone" {
+  description = "zone"
+}
+
+variable "sa_name" {
+  description = "sa_name"
+}
+
+variable "sa_email" {
+  description = "sa_email"
+}
 
 resource "google_service_account" "service_account" {
-  account_id   = "asci13srechallengeciaccount"
+  account_id   = var.sa_name
   display_name = "Challenge CI Account"
   project = var.project_id
 }
