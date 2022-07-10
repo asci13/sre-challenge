@@ -12,7 +12,7 @@ env:
   GKE_CLUSTER: asci13-sre-challenge-gke   # Add your cluster name here.
   GKE_ZONE: europe-west1   # Add your cluster zone here.
   DEPLOYMENT_NAME: gke-test # Add your deployment name here.
-  IMAGE: static-site
+  CHART_RELEASE: sre-challenge
 
 jobs:
 
@@ -96,5 +96,9 @@ jobs:
     - name: Run helm install on chart tarball
       run: |
         release=$(helm ls --all --short)
-        helm uninstall $release
-        helm install charts/sre-spec-chart --generate-name
+        if [ -z "$release" ]
+        then
+          helm install ${{ env.CHART_RELEASE }} charts/sre-spec-chart
+        else
+          helm upgrade ${{ env.CHART_RELEASE }} charts/sre-spec-chart
+        fi
